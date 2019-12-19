@@ -1,6 +1,6 @@
-<div id="app">
+<template>
   <div>
-    <b-navbar toggleable="lg" type="dark" variant="info">
+    <b-navbar fixed="top" toggleable="lg" type="dark" variant="info">
       <b-navbar-brand href="#">Anglur's Memory</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -22,15 +22,7 @@
       </b-collapse>
     </b-navbar>
   </div>
+</template>
 
-  <b-container fluid class="p-4 bg-light">
-    <b-row>
-      <% @posts.each do |post| %>
-        <b-col lg="3" md="4" sm="6">
-          <b-img center thumbnail fluid src="https://picsum.photos/250/250/?image=54" alt="Image 1" class="mb-3"></b-img>
-        </b-col>
-      <% end %>
-    </b-row>
-  </b-container>
-</div>
-<%= javascript_pack_tag 'post' %>
+<script></script>
+<style scoped></style>
