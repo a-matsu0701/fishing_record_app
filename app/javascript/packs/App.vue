@@ -1,24 +1,26 @@
 <template>
   <div>
     <Header />
-    <b-container fluid class="mt-5 p-4 bg-light">
+    <b-container class="mt-5 p-5 bg-light">
       <b-row>
-        <b-col lg="3" md="4" sm="6" v-for="post in posts" :key="post.id">
+        <b-col lg="4" md="6" sm="12" v-for="post in posts" :key="post.id">
           <b-img
             v-b-modal.modal-show
             center
             thumbnail
             fluid
-            src="https://picsum.photos/250/250/?image=54"
+            src="https://picsum.photos/600/400/?image=54"
             alt="Image 1"
-            class="mb-3 mousepointer-hand"
+            class="mousepointer-hand px-1"
             v-on:click="setPostInfo(post.id)"
           ></b-img>
+          <p class="mb-4">{{ post.title }}</p>
         </b-col>
       </b-row>
     </b-container>
 
-    <ShowModal :postInfo="postInfo" />
+    <ShowModal :postInfo="postInfo" :message="message" @close="message = ''" />
+    <CreateModal @create="showPost" />
   </div>
 </template>
 
@@ -29,6 +31,7 @@ import BootstrapVue from "bootstrap-vue";
 import axios from "axios";
 import Header from "../components/Header.vue";
 import ShowModal from "../components/ShowModal.vue";
+import CreateModal from "../components/CreateModal.vue";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -40,15 +43,16 @@ Vue.filter("dateFormat", function(date) {
 });
 
 export default {
-  name: "PostHome",
   components: {
     Header,
-    ShowModal
+    ShowModal,
+    CreateModal
   },
   data: function() {
     return {
       postInfo: {},
-      posts: []
+      posts: [],
+      message: ""
     };
   },
   mounted: function() {
@@ -56,19 +60,20 @@ export default {
   },
   methods: {
     fetchPosts() {
-      axios.get("/api/posts.json").then(
-        res => {
-          this.posts = res.data;
-        },
-        error => {
-          console.log(error);
-        }
-      );
+      axios.get("/api/posts.json").then(res => {
+        this.posts = res.data;
+      });
     },
     setPostInfo(id) {
       axios.get(`/api/posts/${id}.json`).then(res => {
         this.postInfo = res.data;
       });
+    },
+    showPost: function(data) {
+      this.fetchPosts();
+      this.postInfo = data;
+      this.message = "Registration has been completed.";
+      this.$bvModal.show("modal-show");
     }
   }
 };

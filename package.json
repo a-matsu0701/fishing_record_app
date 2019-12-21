@@ -6,7 +6,9 @@
     "axios": "^0.19.0",
     "bootstrap-vue": "^2.1.0",
     "moment": "^2.24.0",
+    "rails-ujs": "^5.2.4-1",
     "vue": "^2.6.11",
+    "vue-ctk-date-time-picker": "^2.4.0",
     "vue-loader": "^15.8.3",
     "vue-template-compiler": "^2.6.11"
   },
