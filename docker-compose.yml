@@ -8,9 +8,12 @@ services:
       - "3306:3306"
     volumes:
       - ./tmp/db:/var/lib/mysql
-  web:
+  web: &web
     build: .
-    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    command: ./bin/rails s -b 0
+    environment:
+      WEBPACKER_DEV_SERVER_HOST: webpacker
+      WEBPACKER_DEV_SERVER_PUBLIC: 0.0.0.0:3035
     volumes:
       - .:/sample_app
     ports:
@@ -19,6 +22,13 @@ services:
       - db
     tty: true
     stdin_open: true
+  webpacker:
+    <<: *web
+    command: ./bin/webpack-dev-server
+    depends_on:
+      - web
+    ports:
+      - "3035:3035"
 
 volumes:
   bundle-data:

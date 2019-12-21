@@ -1,5 +1,14 @@
 <template>
-  <b-modal id="modal-show" centered title="Detail">
+  <b-modal
+    id="modal-show"
+    title="Detail"
+    ok-title="close"
+    ok-variant="secondary"
+    ok-only
+    centered
+    @hidden="$emit('close')"
+  >
+    <b-alert v-if="message.length != 0" variant="success" dismissible show>{{ message }}</b-alert>
     <b-container>
       <div>
         <b-carousel
@@ -54,14 +63,13 @@
 </template>
 
 <script>
-import moment from "moment";
-import Vue from "vue";
-
 export default {
-  name: "BookShow",
   props: {
     postInfo: {
       type: Object
+    },
+    message: {
+      type: String
     }
   }
 };

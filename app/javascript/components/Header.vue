@@ -8,6 +8,10 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="ml-auto">
           <b-navbar-nav>
+            <b-nav-item v-b-modal.modal-create>投稿する</b-nav-item>
+          </b-navbar-nav>
+
+          <b-navbar-nav>
             <b-nav-item href="#">Sign In</b-nav-item>
           </b-navbar-nav>
 
