@@ -12,6 +12,8 @@ apt-get update && apt-get install -y yarn
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
 apt-get install nodejs
 
+RUN apt-get install -y imagemagick
+
 ENV APP_HOME /sample_app
 
 RUN mkdir -p $APP_HOME
