@@ -5,6 +5,8 @@
     ok-title="Submit"
     centered
     no-close-on-backdrop
+    :ok-disabled="processing"
+    :cancel-disabled="processing"
     @show="resetModal"
     @hidden="resetModal"
     @ok="handleSubmit"
@@ -16,6 +18,16 @@
             <li>{{ e }}</li>
           </ul>
         </b-alert>
+
+        <b-form-group id="input-group-image" label="Image:" label-for="input-image">
+          <b-form-file
+            id="input-image"
+            accept="image/*"
+            placeholder="画像を選択してください"
+            @change="selectedFile"
+          ></b-form-file>
+        </b-form-group>
+
         <b-form-group id="input-group-title" label="Title:" label-for="input-title">
           <b-form-input id="input-title" v-model="post.title" type="text" required></b-form-input>
         </b-form-group>
@@ -72,9 +84,11 @@ export default {
         size: "",
         weight: "",
         number: "",
-        comment: ""
+        comment: "",
+        image: ""
       },
-      errors: ""
+      errors: "",
+      processing: false
     };
   },
   computed: {
@@ -95,17 +109,29 @@ export default {
         size: "",
         weight: "",
         number: "",
-        comment: ""
+        comment: "",
+        image: ""
       };
       this.errors = "";
+      this.processing = false;
+    },
+    selectedFile: function(e) {
+      e.preventDefault();
+      const files = e.target.files;
+      this.post.image = files.length >= 1 ? files[0] : "";
     },
     handleSubmit(bvModalEvt) {
+      this.processing = true;
       bvModalEvt.preventDefault();
       this.createPost();
     },
     createPost: function() {
+      const formData = new FormData();
+      Object.entries(this.post).forEach(([key, value]) =>
+        formData.append(`post[${key}]`, value)
+      );
       axios
-        .post("/api/posts", this.post)
+        .post("/api/posts", formData)
         .then(res => {
           let e = res.data;
           this.$nextTick(() => {
@@ -117,6 +143,7 @@ export default {
           if (error.response.data && error.response.data.errors) {
             this.errors = error.response.data.errors;
           }
+          this.processing = false;
         });
     }
   }

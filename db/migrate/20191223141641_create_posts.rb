@@ -7,6 +7,8 @@ class CreatePosts < ActiveRecord::Migration[5.2]
       t.integer :weight
       t.datetime :date, null: false
       t.integer :number
+      t.text :index_img_path, null: false
+      t.text :show_img_path, null: false
 
       t.timestamps
     end

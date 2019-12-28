@@ -9,12 +9,13 @@
             center
             thumbnail
             fluid
-            src="https://picsum.photos/600/400/?image=54"
+            :src="post.index_img_path"
             alt="Image 1"
             class="mousepointer-hand px-1"
             v-on:click="setPostInfo(post.id)"
           ></b-img>
-          <p class="mb-4">{{ post.title }}</p>
+          <p class="mb-0">{{ post.title }}</p>
+          <p class="mb-4">{{ post.date | dateFormat }}</p>
         </b-col>
       </b-row>
     </b-container>

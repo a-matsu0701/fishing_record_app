@@ -14,7 +14,21 @@ class Api::PostsController < ApplicationController
   end
 
   def create
+    params['post']['image'] = nil if params['post']['image'].blank?
     post = Post.new(post_params)
+
+    if post.valid?
+      post["index_img_path"] = polymorphic_url(
+                                post.image.variant(combine_options:{
+                                                    auto_orient: true,
+                                                    resize:"240x240^",
+                                                    crop:"360x240+0+0",
+                                                    gravity: :center
+                                                  }).processed)
+
+      post["show_img_path"] = polymorphic_url(post.image.variant(auto_orient: true).processed)
+    end
+
     if post.save
       render json: post, status: :created
     else
@@ -29,7 +43,7 @@ class Api::PostsController < ApplicationController
     end
 
     def post_params
-      params.fetch(:post, {}).permit(:title, :date, :size, :weight, :number, :comment)
+      params.require(:post).permit(:title, :date, :size, :weight, :number, :comment, :index_img_path, :show_img_path, :image)
     end
 
     def render_status_404(exception)
