@@ -2,6 +2,6 @@ Rails.application.routes.draw do
   root to: 'home#index'
 
   namespace :api do
-    resources :posts, only: [:index, :show, :create]
+    resources :posts, only: [:index, :show, :create, :update]
   end
 end
