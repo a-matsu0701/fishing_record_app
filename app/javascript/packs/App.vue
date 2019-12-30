@@ -20,8 +20,9 @@
       </b-row>
     </b-container>
 
-    <ShowModal :postInfo="postInfo" :message="message" @close="message = ''" />
-    <CreateModal @create="showPost" />
+    <ShowModal :postInfo="postInfo" :message="message" @close="closeReset" @edit="updatePost" />
+    <CreateModal @submit="showPost" />
+    <UpdateModal :post="postInfo" @close="closeReset" @submit="showPost" />
   </div>
 </template>
 
@@ -33,6 +34,7 @@ import axios from "axios";
 import Header from "../components/Header.vue";
 import ShowModal from "../components/ShowModal.vue";
 import CreateModal from "../components/CreateModal.vue";
+import UpdateModal from "../components/UpdateModal.vue";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -47,7 +49,8 @@ export default {
   components: {
     Header,
     ShowModal,
-    CreateModal
+    CreateModal,
+    UpdateModal
   },
   data: function() {
     return {
@@ -70,11 +73,20 @@ export default {
         this.postInfo = res.data;
       });
     },
-    showPost: function(data) {
+    closeReset() {
+      this.postInfo = {};
+      this.message = "";
+    },
+    showPost: function(id) {
       this.fetchPosts();
-      this.postInfo = data;
+      this.setPostInfo(id);
       this.message = "Registration has been completed.";
       this.$bvModal.show("modal-show");
+    },
+    updatePost: function(id) {
+      this.$bvModal.hide("modal-show");
+      this.setPostInfo(id);
+      this.$bvModal.show("modal-update");
     }
   }
 };

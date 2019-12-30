@@ -6,29 +6,14 @@
     ok-variant="secondary"
     ok-only
     centered
-    @hidden="$emit('close')"
+    @close="$emit('close')"
+    @cancel="$emit('close')"
+    @hide="$emit('close')"
   >
     <b-alert v-if="message.length != 0" variant="success" dismissible show>{{ message }}</b-alert>
     <b-container>
       <div>
-        <b-carousel
-          id="carousel-fade"
-          style="text-shadow: 0px 0px 2px #000"
-          fade
-          indicators
-          img-width="480"
-          img-height="300"
-        >
-          <b-carousel-slide caption="First slide" :img-src="postInfo.show_img_path"></b-carousel-slide>
-          <b-carousel-slide
-            caption="Second Slide"
-            img-src="https://picsum.photos/1024/480/?image=12"
-          ></b-carousel-slide>
-          <b-carousel-slide
-            caption="Third Slide"
-            img-src="https://picsum.photos/1024/480/?image=22"
-          ></b-carousel-slide>
-        </b-carousel>
+        <b-img :src="postInfo.show_img_path" fluid></b-img>
       </div>
       <h3 class="mt-4">Data</h3>
       <b-row class="mt-3">
@@ -56,6 +41,9 @@
         <b-col>{{ postInfo.comment }}</b-col>
       </b-row>
     </b-container>
+    <div class="text-right mt-3">
+      <b-button @click="editPost" size="sm" variant="success">Edit</b-button>
+    </div>
   </b-modal>
 </template>
 
@@ -67,6 +55,11 @@ export default {
     },
     message: {
       type: String
+    }
+  },
+  methods: {
+    editPost: function() {
+      this.$emit("edit", this.postInfo.id);
     }
   }
 };

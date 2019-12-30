@@ -1,7 +1,7 @@
 <template>
   <b-modal
-    id="modal-create"
-    title="Create"
+    id="modal-update"
+    title="Update"
     ok-title="Submit"
     centered
     no-close-on-backdrop
@@ -9,10 +9,12 @@
     :cancel-disabled="processing"
     @show="resetModal"
     @hidden="resetModal"
+    @close="$emit('close')"
+    @cancel="$emit('close')"
     @ok="handleSubmit"
   >
     <b-container>
-      <b-form @submit.prevent="createPost">
+      <b-form @submit.prevent="updatePost">
         <b-alert v-if="errors.length != 0" variant="danger" show>
           <ul v-for="e in errors" :key="e">
             <li>{{ e }}</li>
@@ -27,6 +29,9 @@
             @change="selectedFile"
           ></b-form-file>
         </b-form-group>
+        <div>
+          <b-img :src="post.show_img_path" fluid class="mb-4" v-show="nowImage"></b-img>
+        </div>
 
         <b-form-group id="input-group-title" label="Title:" label-for="input-title">
           <b-form-input id="input-title" v-model="post.title" type="text" required></b-form-input>
@@ -76,17 +81,12 @@ Vue.component("VueCtkDateTimePicker", VueCtkDateTimePicker);
 axios.defaults.headers.common["X-CSRF-Token"] = csrfToken();
 
 export default {
+  props: {
+    post: {}
+  },
   data: function() {
     return {
-      post: {
-        title: "",
-        date: "",
-        size: "",
-        weight: "",
-        number: "",
-        comment: "",
-        image: ""
-      },
+      nowImage: true,
       errors: "",
       processing: false
     };
@@ -103,41 +103,39 @@ export default {
   },
   methods: {
     resetModal() {
-      this.post = {
-        title: "",
-        date: "",
-        size: "",
-        weight: "",
-        number: "",
-        comment: "",
-        image: ""
-      };
+      this.nowImage = true;
       this.errors = "";
       this.processing = false;
     },
     selectedFile: function(e) {
       e.preventDefault();
       const files = e.target.files;
-      this.post.image = files.length >= 1 ? files[0] : "";
+      if (files.length >= 1) {
+        this.nowImage = false;
+        this.post.image = files[0];
+      } else {
+        this.nowImage = true;
+        delete this.post.image;
+      }
     },
     handleSubmit(bvModalEvt) {
       this.processing = true;
       bvModalEvt.preventDefault();
-      this.createPost();
+      this.updatePost();
     },
-    createPost: function() {
+    updatePost: function() {
       const formData = new FormData();
       Object.entries(this.post).forEach(([key, value]) =>
         formData.append(`post[${key}]`, value)
       );
       axios
-        .post("/api/posts", formData)
+        .patch(`/api/posts/${this.post.id}`, formData)
         .then(res => {
           let e = res.data;
           this.$nextTick(() => {
-            this.$bvModal.hide("modal-create");
+            this.$bvModal.hide("modal-update");
           });
-          this.$emit("submit", e.id);
+          this.$emit("submit", this.post.id);
         })
         .catch(error => {
           if (error.response.data && error.response.data.errors) {
