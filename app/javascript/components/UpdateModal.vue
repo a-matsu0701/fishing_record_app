@@ -125,9 +125,12 @@ export default {
     },
     updatePost: function() {
       const formData = new FormData();
-      Object.entries(this.post).forEach(([key, value]) =>
-        formData.append(`post[${key}]`, value)
-      );
+      for (let [key, value] of Object.entries(this.post)) {
+        if (value == null) {
+          value = "";
+        }
+        formData.append(`post[${key}]`, value);
+      }
       axios
         .patch(`/api/posts/${this.post.id}`, formData)
         .then(res => {

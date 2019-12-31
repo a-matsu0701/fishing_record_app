@@ -20,7 +20,13 @@
       </b-row>
     </b-container>
 
-    <ShowModal :postInfo="postInfo" :message="message" @close="closeReset" @edit="updatePost" />
+    <ShowModal
+      :postInfo="postInfo"
+      :message="message"
+      @close="closeReset"
+      @edit="updatePost"
+      @delete="deletePost"
+    />
     <CreateModal @submit="showPost" />
     <UpdateModal :post="postInfo" @close="closeReset" @submit="showPost" />
   </div>
@@ -87,6 +93,13 @@ export default {
       this.$bvModal.hide("modal-show");
       this.setPostInfo(id);
       this.$bvModal.show("modal-update");
+    },
+    deletePost: function() {
+      this.fetchPosts();
+      this.$bvModal.msgBoxOk("削除が完了しました。", {
+        size: "sm",
+        buttonSize: "sm"
+      });
     }
   }
 };

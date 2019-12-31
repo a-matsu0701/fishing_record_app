@@ -1,5 +1,5 @@
 class Api::PostsController < ApplicationController
-  before_action :set_post, only: [:show, :update]
+  before_action :set_post, only: [:show, :update, :destroy]
 
   rescue_from Exception, with: :render_status_500
   rescue_from ActiveRecord::RecordNotFound, with: :render_status_404
@@ -37,6 +37,14 @@ class Api::PostsController < ApplicationController
       head :no_content
     rescue ActiveRecord::RecordInvalid => e
       render json: { errors: @post.errors.full_messages }, status: :unprocessable_entity
+  end
+
+  def destroy
+    if @post.destroy
+      head :no_content
+    else
+      render json: { errors: post.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
