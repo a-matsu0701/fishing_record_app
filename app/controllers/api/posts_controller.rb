@@ -1,12 +1,22 @@
 class Api::PostsController < ApplicationController
+  PER_PAGE = 9
+
   before_action :set_post, only: [:show, :update, :destroy]
 
   rescue_from Exception, with: :render_status_500
   rescue_from ActiveRecord::RecordNotFound, with: :render_status_404
 
   def index
-    posts = Post.all
-    render json: posts
+  end
+
+  def search
+    q = Post.ransack(search_params)
+    posts = q.result(distinct: true).pager(page: params[:page], per: PER_PAGE)
+    pager_info = pager_info(q)
+
+    respond_to do |f|
+      f.json { render json: {posts: posts, pager_info: pager_info }}
+    end
   end
 
   def show
@@ -53,8 +63,27 @@ class Api::PostsController < ApplicationController
       @post = Post.find(params[:id])
     end
 
+    def search_params
+      params.require(:q).permit(:title_cont, :date_gteq, :date_lteq, :sorts)
+    end
+
     def post_params
       params.require(:post).permit(:title, :date, :size, :weight, :number, :comment, :index_img_path, :show_img_path, :image)
+    end
+
+    def pager_info(q)
+      pager_info = {}
+      pager_info[:total_count] = q.result(distinct: true).count
+      pager_info[:st_count] = (params[:page].to_i - 1) * PER_PAGE + 1
+      pager_info[:st_count] -= 1 if pager_info[:total_count] == 0
+
+      now_max = params[:page].to_i * PER_PAGE
+      pager_info[:end_count] = pager_info[:total_count] >= now_max ? now_max : pager_info[:total_count]
+
+      pager_info[:max_page] = pager_info[:total_count] / PER_PAGE
+      pager_info[:max_page] += 1 if pager_info[:total_count] % PER_PAGE != 0
+
+      return pager_info
     end
 
     def set_img_path(p)
