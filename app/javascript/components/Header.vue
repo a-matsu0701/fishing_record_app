@@ -1,17 +1,18 @@
 <template>
   <div>
     <b-navbar fixed="top" toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand href="#">Anglur's Memory</b-navbar-brand>
+      <b-navbar-brand>{{ dictionaryWords.words.app_title }}</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="ml-auto">
           <b-navbar-nav>
-            <b-nav-item v-b-modal.modal-create>投稿する</b-nav-item>
+            <b-button v-b-modal.modal-create size="sm">{{ dictionaryWords.button.create }}</b-button>
           </b-navbar-nav>
 
-          <b-navbar-nav>
+          <!-- TODO: ユーザ認証機能実装 -->
+          <!-- <b-navbar-nav>
             <b-nav-item href="#">Sign In</b-nav-item>
           </b-navbar-nav>
 
@@ -21,12 +22,20 @@
             </template>
             <b-dropdown-item href="#">Profile</b-dropdown-item>
             <b-dropdown-item href="#">Sign Out</b-dropdown-item>
-          </b-nav-item-dropdown>
+          </b-nav-item-dropdown>-->
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
   </div>
 </template>
 
-<script></script>
+<script>
+export default {
+  props: {
+    dictionaryWords: {
+      type: Object
+    }
+  }
+};
+</script>
 <style scoped></style>

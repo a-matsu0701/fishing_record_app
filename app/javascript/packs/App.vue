@@ -1,13 +1,13 @@
 <template>
   <div>
-    <Header />
+    <Header :dictionaryWords="dictionaryWords" />
     <b-container class="mt-5 p-5 bg-light">
       <b-form class="p-3 mb-5 border rounded">
         <b-form-row sm="10">
           <b-col sm="4">
             <b-form-group
-              label-cols-sm="2"
-              label="Title:"
+              label-cols-sm="3"
+              :label="postWords.title"
               label-align-sm="right"
               label-for="input-title"
             >
@@ -16,8 +16,8 @@
           </b-col>
           <b-col sm="4">
             <b-form-group
-              label-cols-sm="2"
-              label="Date:"
+              label-cols-sm="3"
+              :label="postWords.date"
               label-align-sm="right"
               label-for="input-date-from"
             >
@@ -42,8 +42,8 @@
           </b-col>
           <b-col sm="4">
             <b-form-group
-              label-cols-sm="2"
-              label="Sort:"
+              label-cols-sm="3"
+              :label="dictionaryWords.form.sort"
               label-align-sm="right"
               label-for="select-sort"
             >
@@ -55,7 +55,7 @@
       <div class="text-right mt-3 mb-4">
         <span
           class="mr-2"
-        >{{ pagerInfo.st_count }} 〜 {{ pagerInfo.end_count }} / {{ pagerInfo.total_count }} 件</span>
+        >{{ pagerInfo.st_count }} 〜 {{ pagerInfo.end_count }} / {{ pagerInfo.total_count }} {{ dictionaryWords.words.count }}</span>
         <b-button @click="prePage" :disabled="firstPage" size="sm" variant="info" class="mr-1">&lt;</b-button>
         <b-button @click="nextPage" :disabled="lastPage" size="sm" variant="info">&gt;</b-button>
       </div>
@@ -69,9 +69,13 @@
             :src="post.index_img_path"
             alt="Image 1"
             class="mousepointer-hand px-1"
-            v-on:click="setPostInfo(post.id)"
+            @click="setPostInfo(post.id)"
           ></b-img>
-          <p class="mb-0">{{ post.title }}</p>
+          <p
+            v-b-modal.modal-show
+            class="mousepointer-hand mb-0"
+            @click="setPostInfo(post.id)"
+          >{{ post.title }}</p>
           <p class="mb-4">{{ post.date | dateFormat }}</p>
         </b-col>
       </b-row>
@@ -80,12 +84,20 @@
     <ShowModal
       :postInfo="postInfo"
       :message="message"
+      :postWords="postWords"
+      :dictionaryWords="dictionaryWords"
       @close="closeReset"
       @edit="updatePost"
       @delete="deletePost"
     />
-    <CreateModal @submit="showPost" />
-    <UpdateModal :post="postInfo" @close="closeReset" @submit="showPost" />
+    <CreateModal :postWords="postWords" :dictionaryWords="dictionaryWords" @submit="showPost" />
+    <UpdateModal
+      :post="postInfo"
+      :postWords="postWords"
+      :dictionaryWords="dictionaryWords"
+      @close="closeReset"
+      @submit="showPost"
+    />
   </div>
 </template>
 
@@ -109,13 +121,16 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css";
 
+import { i18n } from "../mixins/i18n";
+
 Vue.use(BootstrapVue);
 
 Vue.filter("dateFormat", function(date) {
-  return moment(date).format("YYYY年M月D日 HH:mm");
+  return moment(date).format(I18n.t("dictionary.format.date"));
 });
 
 export default {
+  mixins: [i18n],
   components: {
     Header,
     ShowModal,
@@ -138,9 +153,17 @@ export default {
         sorts: "created_at desc"
       },
       sortOptions: [
-        { value: "created_at desc", text: "新着順" },
-        { value: "date desc", text: "釣れた日順" }
-      ]
+        {
+          value: "created_at desc",
+          text: I18n.t("dictionary.form.select_option.sort.new")
+        },
+        {
+          value: "date desc",
+          text: I18n.t("dictionary.form.select_option.sort.date")
+        }
+      ],
+      postWords: I18n.t("activerecord.attributes.post"),
+      dictionaryWords: I18n.t("dictionary")
     };
   },
   watch: {
@@ -198,7 +221,7 @@ export default {
     showPost: function(id) {
       this.search();
       this.setPostInfo(id);
-      this.message = "Registration has been completed.";
+      this.message = this.dictionaryWords.messages.registration;
       this.$bvModal.show("modal-show");
     },
     updatePost: function(id) {
@@ -208,7 +231,7 @@ export default {
     },
     deletePost: function() {
       this.search();
-      this.$bvModal.msgBoxOk("削除が完了しました。", {
+      this.$bvModal.msgBoxOk(this.dictionaryWords.messages.delete_complete, {
         size: "sm",
         buttonSize: "sm"
       });

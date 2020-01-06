@@ -1,8 +1,8 @@
 <template>
   <b-modal
     id="modal-show"
-    title="Detail"
-    ok-title="close"
+    :title="dictionaryWords.words.detail"
+    :ok-title="dictionaryWords.button.close"
     ok-variant="secondary"
     ok-only
     centered
@@ -21,35 +21,40 @@
       <div>
         <b-img :src="postInfo.show_img_path" fluid></b-img>
       </div>
-      <h3 class="mt-4">Data</h3>
+      <h3 class="mt-4">{{ dictionaryWords.words.data }}</h3>
       <b-row class="mt-3">
-        <b-col cols="3">Title</b-col>
+        <b-col cols="3">{{ postWords.title }}</b-col>
         <b-col>{{ postInfo.title }}</b-col>
       </b-row>
       <b-row class="mt-2">
-        <b-col cols="3">Date</b-col>
+        <b-col cols="3">{{ postWords.date }}</b-col>
         <b-col>{{ postInfo.date | dateFormat }}</b-col>
       </b-row>
       <b-row class="mt-2">
-        <b-col cols="3">Size</b-col>
-        <b-col>{{ postInfo.size }}cm</b-col>
+        <b-col cols="3">{{ postWords.size }}</b-col>
+        <b-col>{{ postInfo.size }}{{ dictionaryWords.words.size }}</b-col>
       </b-row>
       <b-row class="mt-2">
-        <b-col cols="3">Weight</b-col>
-        <b-col>{{ postInfo.weight }}グラム</b-col>
+        <b-col cols="3">{{ postWords.weight }}</b-col>
+        <b-col>{{ postInfo.weight }}{{ dictionaryWords.words.gram }}</b-col>
       </b-row>
       <b-row class="mt-2">
-        <b-col cols="3">Number</b-col>
-        <b-col>{{ postInfo.number }}匹</b-col>
+        <b-col cols="3">{{ postWords.number }}</b-col>
+        <b-col>{{ postInfo.number }}{{ dictionaryWords.words.number }}</b-col>
       </b-row>
       <b-row class="mt-2">
-        <b-col cols="3">Comment</b-col>
+        <b-col cols="3">{{ postWords.comment }}</b-col>
         <b-col>{{ postInfo.comment }}</b-col>
       </b-row>
     </b-container>
     <div class="text-right mt-3">
-      <b-button @click="editPost" size="sm" variant="success" class="mr-2">Edit</b-button>
-      <b-button @click="deletePost" size="sm" variant="danger">Delete</b-button>
+      <b-button
+        @click="editPost"
+        size="sm"
+        variant="success"
+        class="mr-2"
+      >{{ dictionaryWords.button.edit }}</b-button>
+      <b-button @click="deletePost" size="sm" variant="danger">{{ dictionaryWords.button.delete }}</b-button>
     </div>
   </b-modal>
 </template>
@@ -67,6 +72,12 @@ export default {
     },
     message: {
       type: String
+    },
+    postWords: {
+      type: Object
+    },
+    dictionaryWords: {
+      type: Object
     }
   },
   data: function() {
@@ -83,13 +94,14 @@ export default {
     },
     deletePost: function() {
       this.$bvModal
-        .msgBoxConfirm("削除してよろしいですか？", {
+        .msgBoxConfirm(this.dictionaryWords.messages.delete_confirm, {
           size: "sm",
           buttonSize: "sm",
           okVariant: "danger",
           footerClass: "p-2",
           hideHeaderClose: false,
-          centered: true
+          centered: true,
+          cancelTitle: this.dictionaryWords.button.cancel
         })
         .then(confirm => {
           if (confirm) {

@@ -1,8 +1,9 @@
 <template>
   <b-modal
     id="modal-create"
-    title="Create"
-    ok-title="Submit"
+    :title="dictionaryWords.words.new_create"
+    :ok-title="dictionaryWords.button.submit"
+    :cancel-title="dictionaryWords.button.cancel"
     centered
     no-close-on-backdrop
     :ok-disabled="processing"
@@ -19,20 +20,21 @@
           </ul>
         </b-alert>
 
-        <b-form-group id="input-group-image" label="Image:" label-for="input-image">
+        <b-form-group id="input-group-image" :label="postWords.image" label-for="input-image">
           <b-form-file
             id="input-image"
             accept="image/*"
-            placeholder="画像を選択してください"
+            :placeholder="dictionaryWords.messages.select_image"
+            :browse-text="dictionaryWords.button.browse"
             @change="selectedFile"
           ></b-form-file>
         </b-form-group>
 
-        <b-form-group id="input-group-title" label="Title:" label-for="input-title">
+        <b-form-group id="input-group-title" :label="postWords.title" label-for="input-title">
           <b-form-input id="input-title" v-model="post.title" type="text" required></b-form-input>
         </b-form-group>
 
-        <b-form-group id="input-group-date" label="Date:">
+        <b-form-group id="input-group-date" :label="postWords.date">
           <VueCtkDateTimePicker
             :label="''"
             :format="'YYYY-MM-DD HH:mm'"
@@ -43,19 +45,27 @@
           />
         </b-form-group>
 
-        <b-form-group id="input-group-size" label="Size(cm):" label-for="input-size">
+        <b-form-group
+          id="input-group-size"
+          :label="dictionaryWords.form.size"
+          label-for="input-size"
+        >
           <b-form-input id="input-size" v-model="post.size" type="number" min="0"></b-form-input>
         </b-form-group>
 
-        <b-form-group id="input-group-weight" label="Weight(グラム):" label-for="input-weight">
+        <b-form-group
+          id="input-group-weight"
+          :label="dictionaryWords.form.weight"
+          label-for="input-weight"
+        >
           <b-form-input id="input-weight" v-model="post.weight" type="number" min="0"></b-form-input>
         </b-form-group>
 
-        <b-form-group id="input-group-number" label="Number(匹):" label-for="input-number">
+        <b-form-group id="input-group-number" :label="postWords.number" label-for="input-number">
           <b-form-input id="input-number" v-model="post.number" type="number" min="0"></b-form-input>
         </b-form-group>
 
-        <b-form-group id="input-group-comment" label="Comment:" label-for="input-comment">
+        <b-form-group id="input-group-comment" :label="postWords.comment" label-for="input-comment">
           <b-form-textarea id="input-comment" v-model="post.comment"></b-form-textarea>
         </b-form-group>
       </b-form>
@@ -76,6 +86,14 @@ Vue.component("VueCtkDateTimePicker", VueCtkDateTimePicker);
 axios.defaults.headers.common["X-CSRF-Token"] = csrfToken();
 
 export default {
+  props: {
+    postWords: {
+      type: Object
+    },
+    dictionaryWords: {
+      type: Object
+    }
+  },
   data: function() {
     return {
       post: {
