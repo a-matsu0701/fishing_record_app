@@ -14,8 +14,6 @@ apt-get install nodejs
 
 RUN apt-get install -y imagemagick
 
-RUN apt-get install -y vim
-
 ENV APP_HOME /sample_app
 
 RUN mkdir -p $APP_HOME
@@ -24,7 +22,3 @@ ADD Gemfile $APP_HOME/Gemfile
 ADD Gemfile.lock $APP_HOME/Gemfile.lock
 RUN bundle install
 ADD . $APP_HOME
-
-RUN mkdir -p tmp/sockets
-
-RUN bundle exec rails assets:precompile
