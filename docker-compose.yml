@@ -1,34 +1,29 @@
 version: '3'
 services:
-  db:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./tmp/db:/var/lib/mysql
-  web: &web
-    build: .
-    command: ./bin/rails s -b 0
-    environment:
-      WEBPACKER_DEV_SERVER_HOST: webpacker
-      WEBPACKER_DEV_SERVER_PUBLIC: 0.0.0.0:3035
+  web:
+    build:
+      context: .
+    command: bundle exec puma -C config/puma.rb
     volumes:
       - .:/sample_app
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
+      - public-data:/sample_app/public
+      - tmp-data:/sample_app/tmp
+      - log-data:/sample_app/log
     tty: true
     stdin_open: true
-  webpacker:
-    <<: *web
-    command: ./bin/webpack-dev-server
+    environment:
+      RAILS_ENV: production
+  nginx:
+    build:
+      context: containers/nginx
+    volumes:
+      - public-data:/sample_app/public
+      - tmp-data:/sample_app/tmp
+    ports:
+      - 80:80
     depends_on:
       - web
-    ports:
-      - "3035:3035"
-
 volumes:
-  bundle-data:
+  public-data:
+  tmp-data:
+  log-data:

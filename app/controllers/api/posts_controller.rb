@@ -81,7 +81,7 @@ class Api::PostsController < ApplicationController
       pager_info[:end_count] = pager_info[:total_count] >= now_max ? now_max : pager_info[:total_count]
 
       pager_info[:max_page] = pager_info[:total_count] / PER_PAGE
-      pager_info[:max_page] += 1 if pager_info[:total_count] % PER_PAGE != 0
+      pager_info[:max_page] += 1 if pager_info[:total_count] % PER_PAGE != 0 || pager_info[:total_count] == 0
 
       return pager_info
     end
