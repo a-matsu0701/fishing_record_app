@@ -24,7 +24,7 @@
       <h3 class="mt-4">{{ dictionaryWords.words.data }}</h3>
       <b-row class="mt-3">
         <b-col cols="3">{{ postWords.title }}</b-col>
-        <b-col>{{ postInfo.title }}</b-col>
+        <b-col class="overflow-auto">{{ postInfo.title }}</b-col>
       </b-row>
       <b-row class="mt-2">
         <b-col cols="3">{{ postWords.date }}</b-col>
@@ -44,7 +44,7 @@
       </b-row>
       <b-row class="mt-2">
         <b-col cols="3">{{ postWords.comment }}</b-col>
-        <b-col>{{ postInfo.comment }}</b-col>
+        <b-col class="overflow-auto">{{ postInfo.comment }}</b-col>
       </b-row>
     </b-container>
     <div class="text-right mt-3">
