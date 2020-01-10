@@ -73,7 +73,7 @@
           ></b-img>
           <p
             v-b-modal.modal-show
-            class="mousepointer-hand mb-0"
+            class="mousepointer-hand mb-0 overflow-auto"
             @click="setPostInfo(post.id)"
           >{{ post.title }}</p>
           <p class="mb-4">{{ post.date | dateFormat }}</p>
