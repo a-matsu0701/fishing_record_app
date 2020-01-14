@@ -7,9 +7,6 @@
     ok-only
     centered
     @hidden="resetModal"
-    @close="$emit('close')"
-    @cancel="$emit('close')"
-    @hide="$emit('close')"
   >
     <b-alert v-if="message.length != 0" variant="success" dismissible show>{{ message }}</b-alert>
     <b-alert v-if="errors.length != 0" variant="danger" show>
@@ -44,7 +41,9 @@
       </b-row>
       <b-row class="mt-2">
         <b-col cols="3">{{ postWords.comment }}</b-col>
-        <b-col class="overflow-auto">{{ postInfo.comment }}</b-col>
+        <b-col class="overflow-auto">
+          <pre>{{ postInfo.comment }}</pre>
+        </b-col>
       </b-row>
     </b-container>
     <div class="text-right mt-3">
@@ -60,39 +59,28 @@
 </template>
 
 <script>
-import axios from "axios";
-import { csrfToken } from "rails-ujs";
-
-axios.defaults.headers.common["X-CSRF-Token"] = csrfToken();
+import { mapState, mapMutations } from "vuex";
 
 export default {
-  props: {
-    postInfo: {
-      type: Object
-    },
-    message: {
-      type: String
-    },
-    postWords: {
-      type: Object
-    },
-    dictionaryWords: {
-      type: Object
-    }
-  },
   data: function() {
     return {
       errors: ""
     };
   },
+  computed: mapState(["postInfo", "message", "postWords", "dictionaryWords"]),
   methods: {
+    ...mapMutations(["resetPostInfo", "resetMessage"]),
     resetModal() {
+      this.resetPostInfo();
+      this.resetMessage();
       this.errors = "";
     },
     editPost: function() {
+      this.$bvModal.hide("modal-show");
       this.$emit("edit", this.postInfo.id);
     },
     deletePost: function() {
+      // 削除確認メッセージモーダル生成
       this.$bvModal
         .msgBoxConfirm(this.dictionaryWords.messages.delete_confirm, {
           size: "sm",
@@ -105,22 +93,25 @@ export default {
         })
         .then(confirm => {
           if (confirm) {
-            axios
+            //OKボタン押下で削除処理
+            this.$http
               .delete(`/api/posts/${this.postInfo.id}`)
               .then(response => {
-                this.$nextTick(() => {
-                  this.$bvModal.hide("modal-show");
-                });
+                this.$bvModal.hide("modal-show");
                 this.$emit("delete");
               })
               .catch(error => {
-                if (error.response.data && error.response.data.errors) {
+                if (
+                  error.response.data &&
+                  error.response.data.errors &&
+                  error.response.status !== 404 &&
+                  error.response.status !== 500
+                ) {
                   this.errors = error.response.data.errors;
                 }
               });
           }
-        })
-        .catch(err => {});
+        });
     }
   }
 };

@@ -7,9 +7,6 @@ class Api::PostsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :render_status_404
 
   def index
-  end
-
-  def search
     q = Post.ransack(search_params)
     posts = q.result(distinct: true).pager(page: params[:page], per: PER_PAGE)
     pager_info = pager_info(q)
@@ -28,6 +25,7 @@ class Api::PostsController < ApplicationController
     post = Post.new(post_params)
 
     if post.valid?
+      # 一覧画面と詳細画面表示用の画像パスをセット
       post["index_img_path"], post["show_img_path"] = set_img_path(post)
     end
 
@@ -39,6 +37,7 @@ class Api::PostsController < ApplicationController
   end
 
   def update
+    # 更新後に画像パスをセットするためトランザクションで管理
     @post.transaction do
       @post.update!(post_params)
       index_img_path, show_img_path = set_img_path(@post)
@@ -73,13 +72,18 @@ class Api::PostsController < ApplicationController
 
     def pager_info(q)
       pager_info = {}
+
+      # 取得件数
       pager_info[:total_count] = q.result(distinct: true).count
+      # 現在ページの開始位置
       pager_info[:st_count] = (params[:page].to_i - 1) * PER_PAGE + 1
+      # 取得件数が０件の場合
       pager_info[:st_count] -= 1 if pager_info[:total_count] == 0
-
+      # 現在ページまでで納まる最大件数
       now_max = params[:page].to_i * PER_PAGE
+      # 現在ページの終了位置
       pager_info[:end_count] = pager_info[:total_count] >= now_max ? now_max : pager_info[:total_count]
-
+      # 最大のページ番号
       pager_info[:max_page] = pager_info[:total_count] / PER_PAGE
       pager_info[:max_page] += 1 if pager_info[:total_count] % PER_PAGE != 0 || pager_info[:total_count] == 0
 
@@ -87,6 +91,7 @@ class Api::PostsController < ApplicationController
     end
 
     def set_img_path(p)
+      # 一覧画面用画像パスの生成
       index_img_path = polymorphic_url(
                                 p.image.variant(combine_options:{
                                                 auto_orient: true,
@@ -94,6 +99,7 @@ class Api::PostsController < ApplicationController
                                                 crop:"360x240+0+0",
                                                 gravity: :center
                                               }).processed)
+      # 詳細画面用画像パスの生成
       show_img_path = polymorphic_url(p.image.variant(auto_orient: true).processed)
 
       return index_img_path, show_img_path

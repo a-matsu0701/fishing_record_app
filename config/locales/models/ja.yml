@@ -21,6 +21,8 @@ ja:
       delete_confirm: 削除してよろしいですか？
       delete_complete: 削除が完了しました
       select_image: 画像を選択してください
+      not_found_error: 該当のデータは存在していません。ご不明な点は管理者へお問い合わせください。
+      system_error: システムエラーが発生しました。管理者へお問い合わせください。
     form:
       size: サイズ（cm）
       weight: 重さ（グラム）
@@ -39,6 +41,7 @@ ja:
       close: 閉じる
       cancel: キャンセル
       browse: 選択
+      reset: リセット
     words:
       app_title: 釣果記録サンプルアプリ
       new_create: 新規投稿

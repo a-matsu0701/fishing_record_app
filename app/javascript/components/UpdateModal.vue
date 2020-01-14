@@ -8,10 +8,8 @@
     no-close-on-backdrop
     :ok-disabled="processing"
     :cancel-disabled="processing"
-    @show="resetModal"
+    @show="setPost"
     @hidden="resetModal"
-    @close="$emit('close')"
-    @cancel="$emit('close')"
     @ok="handleSubmit"
   >
     <b-container>
@@ -32,7 +30,7 @@
           ></b-form-file>
         </b-form-group>
         <div>
-          <b-img :src="post.show_img_path" fluid class="mb-4" v-show="nowImage"></b-img>
+          <b-img :src="post.show_img_path" fluid class="mb-4" v-show="!newImage"></b-img>
         </div>
 
         <b-form-group id="input-group-title" :label="postWords.title" label-for="input-title">
@@ -80,62 +78,51 @@
 
 <script>
 import moment from "moment";
-import Vue from "vue";
 import axios from "axios";
 import { csrfToken } from "rails-ujs";
-import VueCtkDateTimePicker from "vue-ctk-date-time-picker";
-import "vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css";
-
-Vue.component("VueCtkDateTimePicker", VueCtkDateTimePicker);
+import { mapState } from "vuex";
+import { datepickerRange } from "../mixins/datepickerRange";
 
 axios.defaults.headers.common["X-CSRF-Token"] = csrfToken();
 
 export default {
-  props: {
-    post: {},
-    postWords: {
-      type: Object
-    },
-    dictionaryWords: {
-      type: Object
-    }
-  },
+  mixins: [datepickerRange],
   data: function() {
     return {
-      nowImage: true,
-      errors: "",
-      processing: false
+      post: {},
+      newImage: false, //画像の差し替えを判定するフラグ
+      processing: false, //更新処理中を判定するフラグ
+      errors: ""
     };
   },
   computed: {
-    start() {
-      const start = moment().add(-50, "years");
-      return start.format("YYYY-MM-DDTHH:mm:ss");
-    },
-    end() {
-      const end = moment();
-      return end.format("YYYY-MM-DDTHH:mm:ss");
-    }
+    ...mapState(["postInfo", "postWords", "dictionaryWords"])
   },
   methods: {
+    setPost() {
+      this.post = this.postInfo;
+    },
     resetModal() {
-      this.nowImage = true;
-      this.errors = "";
+      this.post = {};
+      this.newImage = false;
       this.processing = false;
+      this.errors = "";
     },
     selectedFile: function(e) {
       e.preventDefault();
       const files = e.target.files;
       if (files.length >= 1) {
-        this.nowImage = false;
+        //新たな画像を選択した場合
+        this.newImage = true;
         this.post.image = files[0];
       } else {
-        this.nowImage = true;
+        //新たな画像の選択を解除した場合
+        this.newImage = false;
         delete this.post.image;
       }
     },
     handleSubmit(bvModalEvt) {
-      this.processing = true;
+      this.processing = true; //更新処理中はボタンを非活性にする
       bvModalEvt.preventDefault();
       this.updatePost();
     },
@@ -147,17 +134,20 @@ export default {
         }
         formData.append(`post[${key}]`, value);
       }
-      axios
+      this.$http
         .patch(`/api/posts/${this.post.id}`, formData)
         .then(res => {
           let e = res.data;
-          this.$nextTick(() => {
-            this.$bvModal.hide("modal-update");
-          });
+          this.$bvModal.hide("modal-update");
           this.$emit("submit", this.post.id);
         })
         .catch(error => {
-          if (error.response.data && error.response.data.errors) {
+          if (
+            error.response.data &&
+            error.response.data.errors &&
+            error.response.status !== 404 &&
+            error.response.status !== 500
+          ) {
             this.errors = error.response.data.errors;
           }
           this.processing = false;

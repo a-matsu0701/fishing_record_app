@@ -13,6 +13,7 @@
     "vue-ctk-date-time-picker": "^2.4.0",
     "vue-loader": "^15.8.3",
     "vue-template-compiler": "^2.6.11",
+    "vue-toasted": "^1.1.27",
     "vuex": "^3.1.2"
   },
   "devDependencies": {

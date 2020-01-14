@@ -8,7 +8,6 @@
     no-close-on-backdrop
     :ok-disabled="processing"
     :cancel-disabled="processing"
-    @show="resetModal"
     @hidden="resetModal"
     @ok="handleSubmit"
   >
@@ -75,25 +74,11 @@
 
 <script>
 import moment from "moment";
-import Vue from "vue";
-import axios from "axios";
-import { csrfToken } from "rails-ujs";
-import VueCtkDateTimePicker from "vue-ctk-date-time-picker";
-import "vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css";
-
-Vue.component("VueCtkDateTimePicker", VueCtkDateTimePicker);
-
-axios.defaults.headers.common["X-CSRF-Token"] = csrfToken();
+import { mapState } from "vuex";
+import { datepickerRange } from "../mixins/datepickerRange";
 
 export default {
-  props: {
-    postWords: {
-      type: Object
-    },
-    dictionaryWords: {
-      type: Object
-    }
-  },
+  mixins: [datepickerRange],
   data: function() {
     return {
       post: {
@@ -105,19 +90,12 @@ export default {
         comment: "",
         image: ""
       },
-      errors: "",
-      processing: false
+      processing: false, //登録処理中を判定するフラグ
+      errors: ""
     };
   },
   computed: {
-    start() {
-      const start = moment().add(-50, "years");
-      return start.format("YYYY-MM-DDTHH:mm:ss");
-    },
-    end() {
-      const end = moment();
-      return end.format("YYYY-MM-DDTHH:mm:ss");
-    }
+    ...mapState(["postWords", "dictionaryWords"])
   },
   methods: {
     resetModal() {
@@ -130,8 +108,8 @@ export default {
         comment: "",
         image: ""
       };
-      this.errors = "";
       this.processing = false;
+      this.errors = "";
     },
     selectedFile: function(e) {
       e.preventDefault();
@@ -139,7 +117,7 @@ export default {
       this.post.image = files.length >= 1 ? files[0] : "";
     },
     handleSubmit(bvModalEvt) {
-      this.processing = true;
+      this.processing = true; //登録処理中はボタンを非活性にする
       bvModalEvt.preventDefault();
       this.createPost();
     },
@@ -148,17 +126,20 @@ export default {
       Object.entries(this.post).forEach(([key, value]) =>
         formData.append(`post[${key}]`, value)
       );
-      axios
+      this.$http
         .post("/api/posts", formData)
         .then(res => {
           let e = res.data;
-          this.$nextTick(() => {
-            this.$bvModal.hide("modal-create");
-          });
+          this.$bvModal.hide("modal-create");
           this.$emit("submit", e.id);
         })
         .catch(error => {
-          if (error.response.data && error.response.data.errors) {
+          if (
+            error.response.data &&
+            error.response.data.errors &&
+            error.response.status !== 404 &&
+            error.response.status !== 500
+          ) {
             this.errors = error.response.data.errors;
           }
           this.processing = false;
