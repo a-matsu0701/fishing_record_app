@@ -50,6 +50,26 @@
           </b-form-group>
         </b-col>
       </b-form-row>
+
+      <!-- ログインしている場合のみ、自分の投稿チェックボックスを表示 -->
+      <b-form-row sm="10" v-if="user && isSignIn">
+        <b-col sm="4">
+          <b-form-group
+            label-cols-sm="3"
+            :label="dictionaryWords.form.mypost"
+            label-align-sm="right"
+            label-for="input-mypost"
+          >
+            <b-form-checkbox
+              id="input-mypost"
+              class="pt-2"
+              v-model="query.user_id_eq"
+              :value="user.id"
+              unchecked-value
+            ></b-form-checkbox>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
       <div class="text-right">
         <b-button @click="resetQuery" variant="info" class="mr-2">{{ dictionaryWords.button.reset }}</b-button>
       </div>
@@ -124,6 +144,8 @@ export default {
   },
   computed: {
     ...mapState([
+      "user",
+      "isSignIn",
       "posts",
       "pagerInfo",
       "page",
@@ -155,6 +177,14 @@ export default {
       },
       set(v) {
         this.updateQuery({ key: "date_lteq", value: v });
+      }
+    },
+    queryUserId: {
+      get() {
+        return this.query.user_id_eq;
+      },
+      set(v) {
+        this.updateQuery({ key: "user_id_eq", value: v });
       }
     },
     querySort: {

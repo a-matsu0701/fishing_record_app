@@ -5,14 +5,17 @@
     :ok-title="dictionaryWords.button.submit"
     :cancel-title="dictionaryWords.button.cancel"
     centered
+    no-close-on-esc
     no-close-on-backdrop
     :ok-disabled="processing"
     :cancel-disabled="processing"
+    :hide-header-close="processing"
     @show="setPost"
     @hidden="resetModal"
     @ok="handleSubmit"
   >
     <b-container>
+      <Loading cname="mini-loader" />
       <b-form @submit.prevent="updatePost">
         <b-alert v-if="errors.length != 0" variant="danger" show>
           <ul v-for="e in errors" :key="e">
@@ -34,7 +37,7 @@
         </div>
 
         <b-form-group id="input-group-title" :label="postWords.title" label-for="input-title">
-          <b-form-input id="input-title" v-model="post.title" type="text" required></b-form-input>
+          <b-form-input id="input-title" v-model="post.title" type="text"></b-form-input>
         </b-form-group>
 
         <b-form-group id="input-group-date" :label="postWords.date">
@@ -78,15 +81,15 @@
 
 <script>
 import moment from "moment";
-import axios from "axios";
-import { csrfToken } from "rails-ujs";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import { datepickerRange } from "../mixins/datepickerRange";
-
-axios.defaults.headers.common["X-CSRF-Token"] = csrfToken();
+import Loading from "../components/Loading.vue";
 
 export default {
   mixins: [datepickerRange],
+  components: {
+    Loading
+  },
   data: function() {
     return {
       post: {},
@@ -99,6 +102,7 @@ export default {
     ...mapState(["postInfo", "postWords", "dictionaryWords"])
   },
   methods: {
+    ...mapMutations(["setLoading"]),
     setPost() {
       this.post = this.postInfo;
     },
@@ -123,6 +127,7 @@ export default {
     },
     handleSubmit(bvModalEvt) {
       this.processing = true; //更新処理中はボタンを非活性にする
+      this.setLoading(true);
       bvModalEvt.preventDefault();
       this.updatePost();
     },
@@ -140,6 +145,7 @@ export default {
           let e = res.data;
           this.$bvModal.hide("modal-update");
           this.$emit("submit", this.post.id);
+          this.setLoading(false);
         })
         .catch(error => {
           if (
@@ -151,6 +157,7 @@ export default {
             this.errors = error.response.data.errors;
           }
           this.processing = false;
+          this.setLoading(false);
         });
     }
   }

@@ -17,16 +17,17 @@ export default new Vuex.Store({
       title_cont: null,
       date_gteq: null,
       date_lteq: null,
+      user_id_eq: null,
       sorts: "created_at desc"
     },
     message: "",
+    confirmMessage: "",
     postWords: I18n.t("activerecord.attributes.post"),
-    dictionaryWords: I18n.t("dictionary")
-  },
-  getters: {
-    getPostId: state => {
-      return state.postInfo.id;
-    }
+    dictionaryWords: I18n.t("dictionary"),
+    token: "",
+    user: {},
+    isSignIn: false,
+    loading: false
   },
   mutations: {
     setPosts(state, data) {
@@ -43,6 +44,7 @@ export default new Vuex.Store({
         title_cont: null,
         date_gteq: null,
         date_lteq: null,
+        user_id_eq: null,
         sorts: "created_at desc"
       };
     },
@@ -58,14 +60,23 @@ export default new Vuex.Store({
     setPostInfo(state, post) {
       state.postInfo = post;
     },
-    resetPostInfo(state) {
-      state.postInfo = {};
-    },
     setMessage(state, message) {
       state.message = message;
     },
-    resetMessage(state) {
-      state.message = "";
+    setConfirmMessage(state, confirmMessage) {
+      state.confirmMessage = confirmMessage;
+    },
+    setToken(state, token) {
+      state.token = token;
+    },
+    setUser(state, user) {
+      state.user = user;
+    },
+    setSignIn(state, isSignIn) {
+      state.isSignIn = isSignIn;
+    },
+    setLoading(state, loading) {
+      state.loading = loading;
     }
   },
   actions: {
@@ -100,5 +111,23 @@ export default new Vuex.Store({
         });
       });
     },
+    setLoginUser({ commit }, payload) {
+      return new Promise(resolve => {
+        axios.get(`/api/users/${payload.uid}.json`).then(res => {
+          commit('setToken', payload.token);
+          commit('setUser', res.data);
+          commit('setSignIn', true);
+          resolve();
+        });
+      });
+    },
+    logout({ commit }) {
+      return new Promise(resolve => {
+        commit('setToken', "");
+        commit('setUser', {});
+        commit('setSignIn', false);
+        resolve();
+      });
+    }
   }
 })
