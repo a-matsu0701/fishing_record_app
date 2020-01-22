@@ -21,8 +21,20 @@ ja:
       delete_confirm: 削除してよろしいですか？
       delete_complete: 削除が完了しました
       select_image: 画像を選択してください
+      auth_error: 認証エラーが発生しました。 再度ログインを行ってから操作してください。
       not_found_error: 該当のデータは存在していません。ご不明な点は管理者へお問い合わせください。
       system_error: システムエラーが発生しました。管理者へお問い合わせください。
+      account_created: ユーザ登録およびログインが完了しました
+      login: ログインしました
+      logout: ログアウトしました
+      sample_info: ※サンプルユーザーは下記ログイン情報でご利用頂けます
+      sample_email: メールアドレス：sample@sample.com
+      sample_password: パスワード：password
+      delete_account_notes: ※アカウントの削除にはパスワードの認証が必要です
+      delete_account_confirm: |
+        アカウントを削除すると過去の投稿も削除されます。
+        本当に削除してもよろしいですか？
+      account_deleted: アカウントを削除しました
     form:
       size: サイズ（cm）
       weight: 重さ（グラム）
@@ -31,6 +43,7 @@ ja:
         sort:
           new: 新着順
           date: 釣れた日順
+      mypost: 自分の投稿
     format:
       date: YYYY年M月D日 HH:mm
     button:
@@ -42,12 +55,34 @@ ja:
       cancel: キャンセル
       browse: 選択
       reset: リセット
+      account_delete: アカウント削除
     words:
       app_title: 釣果記録サンプルアプリ
       new_create: 新規投稿
+      new_account: アカウント登録
+      login: ログイン
+      logout: ログアウト
+      profile: プロフィール
+      name: アカウント名
+      account: 釣り人
+      email: メールアドレス
+      password: パスワード
+      password_confirm: パスワード（確認）
+      first_visitor: 初めての方はこちら
       detail: 詳細
       data: データ
       count: 件
       size: cm
       gram: グラム
       number: 匹
+    auth_errors:
+      password_confirm: パスワードとパスワード確認が一致していません
+      name: ユーザ名は1文字以上、25文字以内で入力してください
+      auth/invalid-email: メールアドレスの形式が不正です
+      auth/user-disabled: アカウントが無効です
+      auth/user-not-found: メールアドレスが正しくありません
+      auth/wrong-password: パスワードが正しくありません
+      auth/email-already-in-use: 既に登録されているメールアドレスです
+      auth/operation-not-allowed: メールアドレス/パスワードのアカウントが無効です
+      auth/weak-password: パスワードは6文字以上で設定してください
+      account_delete: アカウントの削除に失敗しました。システム管理者へお問い合わせください。

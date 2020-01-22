@@ -5,13 +5,16 @@
     :ok-title="dictionaryWords.button.submit"
     :cancel-title="dictionaryWords.button.cancel"
     centered
+    no-close-on-esc
     no-close-on-backdrop
     :ok-disabled="processing"
     :cancel-disabled="processing"
+    :hide-header-close="processing"
     @hidden="resetModal"
     @ok="handleSubmit"
   >
     <b-container>
+      <Loading cname="mini-loader" />
       <b-form @submit.prevent="createPost">
         <b-alert v-if="errors.length != 0" variant="danger" show>
           <ul v-for="e in errors" :key="e">
@@ -30,7 +33,7 @@
         </b-form-group>
 
         <b-form-group id="input-group-title" :label="postWords.title" label-for="input-title">
-          <b-form-input id="input-title" v-model="post.title" type="text" required></b-form-input>
+          <b-form-input id="input-title" v-model="post.title" type="text"></b-form-input>
         </b-form-group>
 
         <b-form-group id="input-group-date" :label="postWords.date">
@@ -74,11 +77,15 @@
 
 <script>
 import moment from "moment";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import { datepickerRange } from "../mixins/datepickerRange";
+import Loading from "../components/Loading.vue";
 
 export default {
   mixins: [datepickerRange],
+  components: {
+    Loading
+  },
   data: function() {
     return {
       post: {
@@ -98,6 +105,7 @@ export default {
     ...mapState(["postWords", "dictionaryWords"])
   },
   methods: {
+    ...mapMutations(["setLoading"]),
     resetModal() {
       this.post = {
         title: "",
@@ -118,6 +126,7 @@ export default {
     },
     handleSubmit(bvModalEvt) {
       this.processing = true; //登録処理中はボタンを非活性にする
+      this.setLoading(true);
       bvModalEvt.preventDefault();
       this.createPost();
     },
@@ -132,6 +141,7 @@ export default {
           let e = res.data;
           this.$bvModal.hide("modal-create");
           this.$emit("submit", e.id);
+          this.setLoading(false);
         })
         .catch(error => {
           if (
@@ -143,6 +153,7 @@ export default {
             this.errors = error.response.data.errors;
           }
           this.processing = false;
+          this.setLoading(false);
         });
     }
   }

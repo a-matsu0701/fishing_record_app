@@ -1,7 +1,9 @@
 class Api::PostsController < ApplicationController
   PER_PAGE = 9
 
-  before_action :set_post, only: [:show, :update, :destroy]
+  before_action :authenticate_user, only: [:create, :update, :destroy]  # 認証判定処理
+  before_action :set_post, only: [:show]
+  before_action :set_my_post, only: [:update, :destroy]
 
   rescue_from Exception, with: :render_status_500
   rescue_from ActiveRecord::RecordNotFound, with: :render_status_404
@@ -22,7 +24,7 @@ class Api::PostsController < ApplicationController
 
   def create
     params['post']['image'] = nil if params['post']['image'].blank?
-    post = Post.new(post_params)
+    post = current_user.posts.build(post_params)
 
     if post.valid?
       # 一覧画面と詳細画面表示用の画像パスをセット
@@ -52,7 +54,7 @@ class Api::PostsController < ApplicationController
     if @post.destroy
       head :no_content
     else
-      render json: { errors: post.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @post.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -62,8 +64,12 @@ class Api::PostsController < ApplicationController
       @post = Post.find(params[:id])
     end
 
+    def set_my_post
+      @post = current_user.posts.find(params[:id])
+    end
+
     def search_params
-      params.require(:q).permit(:title_cont, :date_gteq, :date_lteq, :sorts)
+      params.require(:q).permit(:title_cont, :date_gteq, :date_lteq, :user_id_eq, :sorts)
     end
 
     def post_params

@@ -6,6 +6,10 @@
     ok-variant="secondary"
     ok-only
     centered
+    :no-close-on-esc="processing"
+    :no-close-on-backdrop="processing"
+    :ok-disabled="processing"
+    :hide-header-close="processing"
     @hidden="resetModal"
   >
     <b-alert v-if="message.length != 0" variant="success" dismissible show>{{ message }}</b-alert>
@@ -15,11 +19,16 @@
       </ul>
     </b-alert>
     <b-container>
+      <Loading cname="mini-loader" />
       <div>
         <b-img :src="postInfo.show_img_path" fluid></b-img>
       </div>
       <h3 class="mt-4">{{ dictionaryWords.words.data }}</h3>
       <b-row class="mt-3">
+        <b-col cols="3">{{ dictionaryWords.words.account }}</b-col>
+        <b-col class="overflow-auto">{{ postInfo.user_name }}</b-col>
+      </b-row>
+      <b-row class="mt-2">
         <b-col cols="3">{{ postWords.title }}</b-col>
         <b-col class="overflow-auto">{{ postInfo.title }}</b-col>
       </b-row>
@@ -46,33 +55,58 @@
         </b-col>
       </b-row>
     </b-container>
-    <div class="text-right mt-3">
+
+    <!-- 自身の投稿のみ編集ボタン、削除ボタンを表示する -->
+    <div v-if="user && user.uid == postInfo.user_uid" class="text-right mt-3">
       <b-button
         @click="editPost"
         size="sm"
         variant="success"
+        :disabled="processing"
         class="mr-2"
       >{{ dictionaryWords.button.edit }}</b-button>
-      <b-button @click="deletePost" size="sm" variant="danger">{{ dictionaryWords.button.delete }}</b-button>
+      <b-button
+        @click="deletePost"
+        size="sm"
+        variant="danger"
+        :disabled="processing"
+      >{{ dictionaryWords.button.delete }}</b-button>
     </div>
   </b-modal>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
+import Loading from "../components/Loading.vue";
 
 export default {
+  components: {
+    Loading
+  },
   data: function() {
     return {
+      processing: false,
       errors: ""
     };
   },
-  computed: mapState(["postInfo", "message", "postWords", "dictionaryWords"]),
+  computed: mapState([
+    "user",
+    "postInfo",
+    "message",
+    "postWords",
+    "dictionaryWords"
+  ]),
   methods: {
-    ...mapMutations(["resetPostInfo", "resetMessage"]),
+    ...mapMutations([
+      "setPostInfo",
+      "setConfirmMessage",
+      "setMessage",
+      "setLoading"
+    ]),
     resetModal() {
-      this.resetPostInfo();
-      this.resetMessage();
+      this.setPostInfo({});
+      this.setMessage("");
+      this.processing = false;
       this.errors = "";
     },
     editPost: function() {
@@ -87,18 +121,23 @@ export default {
           buttonSize: "sm",
           okVariant: "danger",
           footerClass: "p-2",
-          hideHeaderClose: false,
           centered: true,
           cancelTitle: this.dictionaryWords.button.cancel
         })
         .then(confirm => {
           if (confirm) {
             //OKボタン押下で削除処理
+            this.processing = true; //削除処理中はボタンを非活性にする
+            this.setLoading(true);
             this.$http
               .delete(`/api/posts/${this.postInfo.id}`)
               .then(response => {
+                this.setConfirmMessage(
+                  this.dictionaryWords.messages.delete_complete
+                );
                 this.$bvModal.hide("modal-show");
                 this.$emit("delete");
+                this.setLoading(false);
               })
               .catch(error => {
                 if (
@@ -109,6 +148,8 @@ export default {
                 ) {
                   this.errors = error.response.data.errors;
                 }
+                this.processing = false;
+                this.setLoading(false);
               });
           }
         });

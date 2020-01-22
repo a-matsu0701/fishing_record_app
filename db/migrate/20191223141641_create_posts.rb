@@ -9,6 +9,7 @@ class CreatePosts < ActiveRecord::Migration[5.2]
       t.integer :number
       t.text :index_img_path, null: false
       t.text :show_img_path, null: false
+      t.references :user, index: true
 
       t.timestamps
     end
