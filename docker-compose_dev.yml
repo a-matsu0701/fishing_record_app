@@ -26,6 +26,7 @@ services:
       REDIS_URL: redis://redis:6379
       WEBPACKER_DEV_SERVER_HOST: webpacker
       WEBPACKER_DEV_SERVER_PUBLIC: 0.0.0.0:3035
+      SELENIUM_DRIVER_URL: http://selenium_chrome:4444/wd/hub
     volumes:
       - .:/sample_app
     ports:
@@ -41,6 +42,10 @@ services:
       - web
     ports:
       - "3035:3035"
+  selenium_chrome:
+    image: selenium/standalone-chrome-debug
+    logging:
+      driver: none
 
 volumes:
   bundle-data:
