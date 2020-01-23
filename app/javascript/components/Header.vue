@@ -35,7 +35,7 @@ import { mapState, mapMutations } from "vuex";
 export default {
   computed: mapState(["user", "isSignIn", "dictionaryWords"]),
   methods: {
-    ...mapMutations(["setConfirmMessage"]),
+    ...mapMutations(["setConfirmMessage", "resetQuery"]),
     homeReload: function() {
       location.reload();
     },
@@ -44,6 +44,7 @@ export default {
         .auth()
         .signOut()
         .then(() => {
+          this.resetQuery();
           this.setConfirmMessage(this.dictionaryWords.messages.logout);
           this.$emit("logout");
         });

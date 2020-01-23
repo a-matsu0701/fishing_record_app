@@ -53,7 +53,7 @@ export default {
   },
   computed: mapState(["dictionaryWords"]),
   methods: {
-    ...mapMutations(["setConfirmMessage", "setLoading"]),
+    ...mapMutations(["setConfirmMessage", "setLoading", "resetQuery"]),
     resetModal() {
       this.password = "";
       this.processing = false;
@@ -93,6 +93,7 @@ export default {
                     user
                       .delete()
                       .then(() => {
+                        this.resetQuery();
                         this.setConfirmMessage(
                           this.dictionaryWords.messages.account_deleted
                         );
