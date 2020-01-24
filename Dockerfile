@@ -26,5 +26,3 @@ RUN bundle install
 ADD . $APP_HOME
 
 RUN mkdir -p tmp/sockets
-
-RUN bundle exec rails assets:precompile
