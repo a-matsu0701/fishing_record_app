@@ -23,4 +23,4 @@
 |Docker|19.03.5||
 |Docker Compose|1.25.0||
 |Firebase Authentication||ユーザー認証に利用|
-|AWS（EC2、RDS）||本番環境のみ|
+|AWS（EC2、RDS、Route 53）||本番環境のみ|
