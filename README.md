@@ -1,6 +1,6 @@
 ## アプリケーション概要
 * Rails + Vue.js + Firebaseで作成した、釣果記録アプリケーションです。
-* <a href="https://www.cyouka-sample.work/" target="_blank">デモページはこちら</a> （Google Chrome、Safariで動作確認済み）
+* <a href="https://www.cyouka-sample.work/" target="_blank">~~デモページはこちら~~</a> （Google Chrome、Safariで動作確認済み）
 
 
 ## 機能一覧
